@@ -47,7 +47,9 @@ async function loadContent() {
         // Générer les cartes de projets
         if (data.projets) {
             const projectList = document.querySelector('.project-list');
-            if (projectList) {
+            const projectsListOnglet = document.querySelector('.projects-list');
+            var card = false;
+            if (projectList && card) {
                 Object.values(data.projets).forEach(projet => {
                     const card = document.createElement('div');
                     card.className = 'project-card';
@@ -56,6 +58,16 @@ async function loadContent() {
                     projectList.appendChild(card);
                 });
             }
+            if (projectsListOnglet && !card) {
+                Object.values(data.projets).forEach(projet => {
+                    const card = document.createElement('div');
+                    card.className = 'project-onglet';
+                    card.innerHTML = `<h3>${projet.nom}</h3>`;
+                    card.innerHTML += `<p>${projet.description}</p>`;
+                    projectsListOnglet.appendChild(card);
+                });
+            }
+
         }
 
     } catch (error) {
