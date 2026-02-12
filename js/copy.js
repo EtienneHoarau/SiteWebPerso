@@ -47,6 +47,7 @@ async function loadContent() {
         // Générer les cartes de projets
         if (data.projets) {
             const projectList = document.querySelector('.project-list');
+            const project = document.querySelector('.projects');
             const projectsListOnglet = document.querySelector('.projects-list');
             var card = false;
             if (projectList && card) {
@@ -59,9 +60,56 @@ async function loadContent() {
                 });
             }
             if (projectsListOnglet && !card) {
+                const projectDescription = document.querySelector('.project-description');
+
                 Object.values(data.projets).forEach(projet => {
-                    const card = document.createElement('div');
+                    // create radio btn
+                    const radioPoint = document.createElement('input');
+                    radioPoint.type = 'radio';
+                    radioPoint.name= 'projectNav';
+                    radioPoint.className='nav-project-radio'
+                    radioPoint.id='projectNav-'+projet.nom;
+
+                    // Ajouter un écouteur d'événement pour mettre à jour la description
+                    radioPoint.addEventListener('change', () => {
+                        if (radioPoint.checked && projectDescription) {
+                            // Générer les cartes de collaborateurs
+                            let collaborateursHTML = '';
+                            if (projet.collaborateurs) {
+                                const linkedinUrl = data.profil?.liens?.linkedin || '#';
+                                const collabList = Array.isArray(projet.collaborateurs)
+                                    ? projet.collaborateurs
+                                    : projet.collaborateurs.split(',').map(c => c.trim());
+
+                                collaborateursHTML = `
+                                    <div class="collaborateurs-section">
+                                        <p><strong>Collaborateurs:</strong></p>
+                                        <div class="collaborateurs-cards">
+                                            ${collabList.map(collab => `
+                                                <a href="${linkedinUrl}" target="_blank" class="collaborateur-card">
+                                                    ${collab}
+                                                </a>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+
+                            projectDescription.innerHTML = `
+                                <h2>${projet.nom}</h2>
+                                <p>${projet.description}</p>
+                                ${collaborateursHTML}
+                                ${projet.lien ? `<p><strong>Lien:</strong> <a href="${projet.lien}" target="_blank">${projet.lien}</a></p>` : ''}
+                            `;
+                        }
+                    });
+
+                    project.appendChild(radioPoint);
+
+                    // create project card
+                    const card = document.createElement('label');
                     card.className = 'project-onglet';
+                    card.setAttribute('for', 'projectNav-'+projet.nom);
                     card.innerHTML = `<h3>${projet.nom}</h3>`;
                     card.innerHTML += `<p>${projet.description}</p>`;
                     projectsListOnglet.appendChild(card);
