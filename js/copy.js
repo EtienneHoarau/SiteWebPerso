@@ -76,7 +76,6 @@ async function loadContent() {
                             // Générer les cartes de collaborateurs
                             let collaborateursHTML = '';
                             if (projet.collaborateurs) {
-                                const linkedinUrl = data.profil?.liens?.linkedin || '#';
                                 const collabList = Array.isArray(projet.collaborateurs)
                                     ? projet.collaborateurs
                                     : projet.collaborateurs.split(',').map(c => c.trim());
@@ -85,10 +84,62 @@ async function loadContent() {
                                     <div class="collaborateurs-section">
                                         <p><strong>Collaborateurs:</strong></p>
                                         <div class="collaborateurs-cards">
-                                            ${collabList.map(collab => `
-                                                <a href="${linkedinUrl}" target="_blank" class="collaborateur-card">
-                                                    ${collab}
+                                            ${collabList.map(collab => {
+                                                // Récupérer le LinkedIn du collaborateur depuis data.collaborateurs
+                                                const collabInfo = data.collaborateurs?.[collab];
+                                                const linkedinUrl = collabInfo?.linkedin;
+
+                                                // Si le LinkedIn existe et n'est pas vide, créer un lien
+                                                if (linkedinUrl && linkedinUrl !== '') {
+                                                    return `
+                                                        <a href="${linkedinUrl}" target="_blank" class="collaborateur-card">
+                                                            ${collab}
+                                                        </a>
+                                                    `;
+                                                } else {
+                                                    // Sinon, créer juste un span non cliquable
+                                                    return `
+                                                        <span class="collaborateur-card collaborateur-card-no-link">
+                                                            ${collab}
+                                                        </span>
+                                                    `;
+                                                }
+                                            }).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+
+                            // Générer les liens du projet
+                            let liensHTML = '';
+                            if (projet.liens && projet.liens.length > 0) {
+                                liensHTML = `
+                                    <div class="liens-section">
+                                        <p><strong>Liens:</strong></p>
+                                        <div class="liens-cards">
+                                            ${projet.liens.map(lien => `
+                                                <a href="${lien.url}" target="_blank" class="lien-card" data-type="${lien.icone || 'link'}">
+                                                    ${lien.icone
+                                                        ? `<img src="${lien.icone}" alt="${lien.nom}" class="lien-icon-img">`
+                                                        : `<span class="lien-icon">${lien.nom}</span>`
+                                                    }
+                                                    <span class="lien-nom">${lien.nom}</span>
                                                 </a>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+
+                            // Générer les cartes de compétences
+                            let competencesHTML = '';
+                            if (projet.competences && projet.competences.length > 0) {
+                                competencesHTML = `
+                                    <div class="competences-section">
+                                        <p><strong>Compétences:</strong></p>
+                                        <div class="competences-cards">
+                                            ${projet.competences.map(competence => `
+                                                <span class="competence-card">${competence}</span>
                                             `).join('')}
                                         </div>
                                     </div>
@@ -99,7 +150,8 @@ async function loadContent() {
                                 <h2>${projet.nom}</h2>
                                 <p>${projet.description}</p>
                                 ${collaborateursHTML}
-                                ${projet.lien ? `<p><strong>Lien:</strong> <a href="${projet.lien}" target="_blank">${projet.lien}</a></p>` : ''}
+                                ${liensHTML}
+                                ${competencesHTML}
                             `;
                         }
                     });

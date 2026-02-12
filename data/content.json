@@ -71,10 +71,14 @@
         "ACADIA":{
             "nom": "ACADIA",
             "description": "Auto encodeur pour nanana.",
-            "collaborateurs": ["Charles Dijon","Arnaud Lefebvre","Antoine JesaisplusQUoi"],
-            "liens" :{
-                "github" :"https://github.com/EtienneHoarau/ACADIA2025"
-            },
+            "collaborateurs": ["Charles Dijon","Arnaud Lefebvre","Antoine Chevallet"],
+            "liens": [
+                {
+                    "nom": "GitHub",
+                    "url": "https://github.com/EtienneHoarau/ACADIA2025",
+                    "icone": "../assets/images/github.png"
+                }
+            ],
             "competences": [
                 "IA",
                 "Python",
@@ -85,9 +89,7 @@
             "nom": "Laura Craft",
             "description": "StageCraft",
             "collaborateurs": ["Promo AVM 2025"],
-            "liens":{
-
-            },
+            "liens": [],
             "competences":[
                 "Blender"
             ]
@@ -96,9 +98,7 @@
             "nom": "HADA",
             "description": "jeu vidéo réalisé pour les cours ",
             "collaborateurs": ["Julien Ganne"],
-            "liens" :{
-                
-            },
+            "liens": [],
             "competences": [
                 "Unity",
                 "C#",
@@ -109,9 +109,7 @@
             "nom":"Beer pong",
             "description":"Mini jeu de beer pong pour un projet de cours",
             "collaborateurs": ["Matthieu Phosanarack"],
-            "liens" : {
-
-            },
+            "liens": [],
             "competences": [
                 "Unity",
                 "C#",
@@ -129,5 +127,29 @@
     },
     "footer": {
         "copyright": "2026 Mon Site Web. Tous droits réservés."
+    },
+    "collaborateurs": {
+        "Charles Dijon": {
+            "nom": "Charles Dijon",
+            "linkedin": "https://www.linkedin.com/in/charles-dijon/"
+        },
+        "Arnaud Lefebvre": {
+            "nom": "Arnaud Lefebvre",
+            "linkedin":"https://www.linkedin.com/in/arnaudlefebvre7/"
+        },
+        "Antoine Chevallet": {
+            "nom": "Antoine Chevallet",
+            "linkedin":"https://www.linkedin.com/in/antoine-chevallet/"
+        },
+        "Promo AVM 2025": {
+            "nom": "Promo AVM 2025"
+        },
+        "Julien Ganne": {
+            "nom": "Julien Ganne",
+            "linkedin": "https://www.linkedin.com/in/julien-ganne/"
+        },
+        "Matthieu Phosanarack": {
+            "nom": "Matthieu Phosanarack"
+        }
     }
 }

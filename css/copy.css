@@ -282,3 +282,89 @@ footer {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+.collaborateur-card-no-link {
+    background-color: #3498db;
+    cursor: default;
+    opacity: 0.7;
+}
+
+.collaborateur-card-no-link:hover {
+    background-color: #2980b9;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Liens du projet */
+.liens-section {
+    margin: 1.5rem 0;
+}
+
+.liens-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.lien-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: #2c3e50;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.lien-card:hover {
+    background-color: #34495e;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.lien-icon {
+    font-size: 1.2rem;
+}
+
+.lien-icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.lien-nom {
+    font-weight: 500;
+}
+
+/* Compétences */
+.competences-section {
+    margin: 1.5rem 0;
+}
+
+.competences-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.competence-card {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #27ae60;
+    color: white;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.competence-card:hover {
+    background-color: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
