@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Site web personnel" />
+    <title>Etienne Hoarau</title>
+    <link rel="stylesheet" href="css/copy.css" />
+  </head>
+  <body>
+    <!-- Radio buttons cachés pour la navigation -->
+    <input type="radio" name="nav" id="nav-accueil" class="nav-radio" checked />
+    <input type="radio" name="nav" id="nav-experiences" class="nav-radio" />
+    <input type="radio" name="nav" id="nav-projets" class="nav-radio" />
+    <input type="radio" name="nav" id="nav-contact" class="nav-radio" />
+
+    <header>
+      <h1 data-content="site.title"></h1>
+    </header>
+
+    <nav class="carousel-nav">
+      <ul class="carousel-list">
+        <li class="carousel-item">
+          <label for="nav-accueil" data-content="navigation.accueil"></label>
+        </li>
+        <li class="carousel-item">
+          <label
+            for="nav-experiences"
+            data-content="navigation.experiences"
+          ></label>
+        </li>
+        <li class="carousel-item">
+          <label for="nav-projets" data-content="navigation.projets"></label>
+        </li>
+        <li class="carousel-item">
+          <label for="nav-contact" data-content="navigation.contact"></label>
+        </li>
+      </ul>
+    </nav>
+
+    <main>
+      <section id="accueil" class="content-section">
+        <h2 data-content="accueil.titre"></h2>
+        <!-- <p data-content="accueil.texte"></p> -->
+        <div class="profile">
+          <div>
+            <img data-src="profil.photo" alt="Ma photo" />
+          </div>
+          <div>
+            <h3 data-content="profil.nom"></h3>
+            <p id="Titre" data-content="formation.etudes.Ingénieur.diplome"></p>
+            <p data-content="profil.description"></p>
+          </div>
+        </div>
+        <div class="contact">
+          <a
+            data-href="profil.liens.email"
+            data-href-prefix="mailto:"
+            target="_blank"
+            ><img src="assets/images/e-mail.png" alt="Email"
+          /></a>
+          <a data-href="profil.liens.github" target="_blank"
+            ><img src="assets/images/github.png" alt="GitHub"
+          /></a>
+          <a data-href="profil.liens.linkedin" target="_blank"
+            ><img src="assets/images/linkedin.png" alt="LinkedIn"
+          /></a>
+        </div>
+      </section>
+
+      <section id="projets" class="content-section">
+        <h2>Projets</h2>
+        <div class="project-list"></div>
+      </section>
+
+      <section id="contact" class="content-section">
+        <h2 data-content="contact.titre"></h2>
+        <p data-content="contact.texte"></p>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; <span data-content="footer.copyright"></span></p>
+    </footer>
+
+    <script src="js/copy.js"></script>
+  </body>
+</html>

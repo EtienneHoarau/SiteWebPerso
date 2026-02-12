@@ -1,0 +1,134 @@
+{
+    "site": {
+        "title": "Etienne Hoarau",
+        "description": "Site web personnel"
+    },
+    "navigation": {
+        "accueil": "Accueil",
+        "aPropos": "À propos",
+        "contact": "Contact",
+        "projets": "Projets",
+        "experiences": "Expériences"
+    },
+    "accueil": {
+        "titre": "Bienvenue",
+        "texte": "Bienvenue sur mon site web personnel."
+    },
+    "profil": {
+        "nom": "Etienne Hoarau",
+        "titre": "Ingénieur Audiovisuel & Multimédia",
+        "description": "Jeune cadre jeune et dynamique mais avec de l'humour (askip )",
+        "photo": "assets/images/photo_CV.jpeg",
+        "liens": {
+            "email": "hoarau.etienne.luc@ikmail.com",
+            "github": "https://github.com/EtienneHoarau",
+            "linkedin": "https://www.linkedin.com/in/etienne-hoarau/"
+        }
+    },
+    "formation": {
+        "titre": "Formation",
+        "etudes": {
+            "Lycée":{
+                "Lieu": "Roland Garros, Le Tampon, Réunion",
+                "annee": "2017 - 2020",
+                "diplome": "Baccalauréat Science de L'Ingénieur - Mention Très Bien - Option Cinéma"
+            },
+            "Ingénieur":{
+                "Lieu": "INSA Hauts-de-France, Valenciennes,Nord",
+                "annee": "2020 - 2025",
+                "diplome": "Ingénieur Audiovisuel & Multimédia"
+            }
+        }  
+    },
+    "experiences":{
+        "Acte1":{
+            "poste": "Maitrise d'œuvre en intégration audiovisuelle",
+            "statut": "Stagiaire",
+            "entreprise": "Acte1",
+            "lieu": "Paris, France",
+            "debut": "Septembre 2023",
+            "fin": "Janvier 2024",
+            "lien": "https://www.acte1.fr/",
+            "projets": [
+                "Participation à la conception et à l'installation de systèmes audiovisuels pour des salles de conférence.",
+                "Collaboration avec les équipes techniques pour assurer la qualité des installations."
+            ]
+        },
+        "ETS_Montreal":{
+            "poste": "Chercheur en technologies immersives",
+            "statut": "Stagiaire",
+            "entreprise": "ETS Montréal",
+            "lieu": "Montréal, Canada",
+            "debut": "Mai 2025",
+            "fin": "Octobre 2025",
+            "lien": "https://www.etsmtl.ca/",
+            "projets": [
+                "Développement d'une plateforme de test des algorithmes de la réalité immersives."
+            ]
+        }
+    },
+    "projets" :{
+        "ACADIA":{
+            "nom": "ACADIA",
+            "description": "Auto encodeur pour nanana.",
+            "collaborateurs": ["Charles Dijon","Arnaud Lefebvre","Antoine JesaisplusQUoi"],
+            "liens" :{
+                "github" :"https://github.com/EtienneHoarau/ACADIA2025"
+            },
+            "competences": [
+                "IA",
+                "Python",
+                "Traitement d'images"
+            ]
+        },
+        "StageCraft":{
+            "nom": "Laura Craft",
+            "description": "StageCraft",
+            "collaborateurs": ["Promo AVM 2025"],
+            "liens":{
+
+            },
+            "competences":[
+                "Blender"
+            ]
+        },
+        "HADA Games":{
+            "nom": "HADA",
+            "description": "jeu vidéo réalisé pour les cours ",
+            "collaborateurs": ["Julien Ganne"],
+            "liens" :{
+                
+            },
+            "competences": [
+                "Unity",
+                "C#",
+                "Game Design"
+            ]
+        },
+        "AVM_mini_games":{
+            "nom":"Beer pong",
+            "description":"Mini jeu de beer pong pour un projet de cours",
+            "collaborateurs": ["Matthieu Phosanarack"],
+            "liens" : {
+
+            },
+            "competences": [
+                "Unity",
+                "C#",
+                "Game Design"
+            ]
+        }
+
+    },
+    "aPropos": {
+        "titre": "À propos",
+        "texte": "Contenu à propos."
+    },
+    "contact": {
+        "titre": "Contact",
+        "texte": "Informations de contact."
+    },
+    "footer": {
+        "copyright": "2026 Mon Site Web. Tous droits réservés."
+    }
+}
