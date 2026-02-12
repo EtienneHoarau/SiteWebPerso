@@ -26,6 +26,20 @@ body {
   padding: 0;
   position: absolute;
   left: 2rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2rem;
+}
+
+.title img {
+  border-radius: 50%;
+  width: 75px;
+  height: 75px;
+  object-fit: cover;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  transform: translateY(0);
+  opacity: 1;
 }
 
 header h1 {
@@ -83,6 +97,13 @@ header h1 {
   transform: scale(1.2);
   opacity: 1;
 }
+
+#nav-accueil:checked ~ nav .title img {
+  transform: translateY(100px);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .contact img {
   border-radius: 100%%;
   width: 100px;
