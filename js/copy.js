@@ -264,7 +264,7 @@ async function loadContent() {
             }
 
             // Créer toutes les entrées
-            expEntries.forEach(exp => {
+            expEntries.forEach((exp, i) => {
                 const entry = document.createElement('div');
                 entry.className = 'timeline-entry';
 
@@ -275,6 +275,12 @@ async function loadContent() {
                 const card = document.createElement('div');
                 card.className = 'timeline-card';
                 card.innerHTML = buildCardHTML(exp);
+
+                // Clic sur une carte pour la sélectionner
+                entry.addEventListener('click', () => {
+                    currentIndex = i;
+                    updateCarousel();
+                });
 
                 entry.appendChild(card);
                 viewport.appendChild(entry);
