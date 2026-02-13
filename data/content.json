@@ -26,19 +26,24 @@
         }
     },
     "formation": {
-        "titre": "Formation",
-        "etudes": {
-            "Lycée":{
-                "Lieu": "Roland Garros, Le Tampon, Réunion",
-                "annee": "2017 - 2020",
-                "diplome": "Baccalauréat Science de L'Ingénieur - Mention Très Bien - Option Cinéma"
-            },
-            "Ingénieur":{
-                "Lieu": "INSA Hauts-de-France, Valenciennes,Nord",
-                "annee": "2020 - 2025",
-                "diplome": "Ingénieur Audiovisuel & Multimédia"
-            }
-        }  
+        "Lycée": {
+            "poste": "Baccalauréat Science de L'Ingénieur - Mention Très Bien - Option Cinéma",
+            "statut": "Lycéen",
+            "entreprise": "Lycée Roland Garros",
+            "lieu": "Le Tampon, Réunion",
+            "debut": "2017",
+            "fin": "2020",
+            "projets": []
+        },
+        "Ingénieur": {
+            "poste": "Ingénieur Audiovisuel & Multimédia",
+            "statut": "Étudiant",
+            "entreprise": "INSA Hauts-de-France",
+            "lieu": "Valenciennes, Nord",
+            "debut": "2020",
+            "fin": "2025",
+            "projets": []
+        }
     },
     "experiences":{
         "Acte1":{
@@ -48,14 +53,14 @@
             "lieu": "Paris, France",
             "debut": "Septembre 2023",
             "fin": "Janvier 2024",
-            "lien": "https://www.acte1.fr/",
+            "lien": "https://www.acte1.net/",
             "projets": [
                 "Participation à la conception et à l'installation de systèmes audiovisuels pour des salles de conférence.",
                 "Collaboration avec les équipes techniques pour assurer la qualité des installations."
             ]
         },
         "ETS_Montreal":{
-            "poste": "Chercheur en technologies immersives",
+            "poste": "Technologies immersives",
             "statut": "Stagiaire",
             "entreprise": "ETS Montréal",
             "lieu": "Montréal, Canada",
@@ -64,6 +69,28 @@
             "lien": "https://www.etsmtl.ca/",
             "projets": [
                 "Développement d'une plateforme de test des algorithmes de la réalité immersives."
+            ]
+        },
+        "Acceuil_Etudiant":{
+            "poste":"Acceuil de nouveaux étudiants et présentation de l'école",
+            "statut":"Job Etudiant",
+            "entreprise":"INSA Hauts-de-France",
+            "lieu":"Valenciennes, Nord",
+            "infoSup":"2 semaines /an",
+            "debut":"2022",
+            "fin":"2025"
+        },
+        "INSINEMA":{
+            "poste":"Club de cinéma étudiant",
+            "statut":"Président",
+            "entreprise":"INSINEMA",
+            "lieu":"Valenciennes, Nord",
+            "debut":"Septembre 2022",
+            "fin":"Janvier 2025",
+            "lien":"https://www.instagram.com/insinema.hdf/",
+            "projets":[
+                "Projection de film",
+                "Organisation d'évènement festif"
             ]
         }
     },

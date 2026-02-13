@@ -192,6 +192,16 @@ footer {
   .carousel-list {
     flex-wrap: wrap;
   }
+
+  .timeline-container {
+    padding-left: 30px;
+  }
+
+  .timeline-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 }
 
 /*-------------- Projects displays -------------------*/
@@ -367,4 +377,156 @@ footer {
     background-color: #229954;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/*-------------- Timeline Expériences -------------------*/
+
+.timeline-container {
+    position: relative;
+    padding-left: 40px;
+    margin-top: 2rem;
+}
+
+.timeline-bar {
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: #3498db;
+}
+
+.timeline-viewport {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.timeline-entry {
+    position: relative;
+    padding-left: 25px;
+}
+
+/* Éléments cachés */
+.timeline-hidden {
+    display: none;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -32px;
+    top: 20px;
+    width: 14px;
+    height: 14px;
+    background-color: #3498db;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px #3498db;
+    z-index: 1;
+    transition: all 0.4s ease;
+}
+
+.timeline-active .timeline-dot {
+    width: 18px;
+    height: 18px;
+    left: -34px;
+    top: 18px;
+}
+
+/* Dot plus petit et discret pour les adjacents */
+.timeline-adjacent .timeline-dot {
+    opacity: 0.5;
+}
+
+.timeline-card {
+    background-color: white;
+    border: 2px solid #2c3e50;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.4s ease;
+}
+
+/* Carte active : pleine taille, ombre bleue */
+.timeline-active .timeline-card {
+    box-shadow: 0 4px 16px rgba(52, 152, 219, 0.25);
+    border-color: #3498db;
+}
+
+/* Carte adjacente : réduite et semi-transparente */
+.timeline-adjacent .timeline-card {
+    transform: scale(0.85);
+    transform-origin: left top;
+    opacity: 0.5;
+}
+
+.timeline-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-card-header h3 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.timeline-statut {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background-color: #3498db;
+    color: white;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.timeline-entreprise {
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-entreprise a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.timeline-entreprise a:hover {
+    text-decoration: underline;
+}
+
+.timeline-lieu {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-dates {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-info-sup {
+    color: #555;
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.timeline-projets {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.timeline-projets li {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+    color: #555;
 }
