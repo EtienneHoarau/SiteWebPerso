@@ -354,7 +354,6 @@ let previousButtonStates = {};
 let pollingActive = false;
 
 function showGamepadButtons() {
-    console.log('Affichage des boutons gamepad');
     const gamepadButtons = document.querySelectorAll('.gamepad_btn');
     gamepadButtons.forEach(btn => {
         btn.style.display = 'flex';
@@ -362,7 +361,6 @@ function showGamepadButtons() {
 }
 
 function hideGamepadButtons() {
-    console.log('Masquage des boutons gamepad');
     const gamepadButtons = document.querySelectorAll('.gamepad_btn');
     gamepadButtons.forEach(btn => {
         btn.style.display = 'none';
@@ -448,9 +446,9 @@ function pollGamepad() {
                         navigateCarousel('left');
                     } else if (buttonIndex === 5 || buttonIndex === 7) {
                         navigateCarousel('right');
-                    } else if (buttonIndex === 12) {
+                    } else if (buttonIndex === 12 && document.getElementById("nav-projets").checked) {
                         navigateProjects('up');
-                    } else if (buttonIndex === 13) {
+                    } else if (buttonIndex === 13 && document.getElementById("nav-projets").checked) {
                         navigateProjects('down');
                     }
                 }
@@ -469,7 +467,6 @@ function pollGamepad() {
 
 function connectGamepad(event) {
     const gamepad = event.gamepad;
-    console.log('Manette connectée:', gamepad.id, 'à l\'index', gamepad.index);
     connectedGamepads[gamepad.index] = gamepad;
     showGamepadButtons();
 
@@ -481,7 +478,6 @@ function connectGamepad(event) {
 
 function disconnectGamepad(event) {
     const gamepad = event.gamepad;
-    console.log('Manette déconnectée:', gamepad.id, 'index', gamepad.index);
     delete connectedGamepads[gamepad.index];
     delete previousButtonStates[gamepad.index];
 
@@ -492,14 +488,12 @@ function disconnectGamepad(event) {
 
 function checkGamepadOnLoad() {
     if (!navigator.getGamepads) {
-        console.log('API Gamepad non supportée par ce navigateur');
         return;
     }
 
     const gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
         if (gamepads[i] !== null) {
-            console.log('Manette trouvée à l\'index', i, ':', gamepads[i].id);
             connectedGamepads[i] = gamepads[i];
         }
     }
