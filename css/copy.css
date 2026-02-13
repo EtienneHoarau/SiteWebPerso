@@ -58,6 +58,18 @@ header h1 {
   min-height: 120px;
 }
 
+.carousel-list-div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.gamepad_btn {
+  display: none;
+  width: 50px;
+}
+
 .carousel-list {
   list-style: none;
   display: flex;
@@ -87,6 +99,11 @@ header h1 {
 .carousel-item label:hover {
   background-color: #72b7e6;
   opacity: 0.8;
+}
+
+.carousel-item label:focus-visible {
+  outline: 3px solid #3498db;
+  outline-offset: 4px;
 }
 
 /* Style de l'élément actif selon le radio sélectionné */
@@ -255,6 +272,19 @@ footer {
 
 .project-onglet:hover {
   background-color: #f0f0f0;
+  transform: translateX(5px);
+}
+
+.project-onglet:focus-visible {
+  outline: 3px solid #3498db;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px rgba(52, 152, 219, 0.2);
+}
+
+input[name="projectNav"]:checked + .project-onglet {
+  background-color: #3498db;
+  color: white;
+  border-color: #2980b9;
   transform: translateX(5px);
 }
 

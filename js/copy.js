@@ -76,7 +76,6 @@ async function loadContent() {
         // Générer les cartes de projets
         if (data.projets) {
             const projectList = document.querySelector('.project-list');
-            const project = document.querySelector('.projects');
             const projectsListOnglet = document.querySelector('.projects-list');
             var card = false;
             if (projectList && card) {
@@ -185,14 +184,15 @@ async function loadContent() {
                         }
                     });
 
-                    project.appendChild(radioPoint);
-
                     // create project card
                     const card = document.createElement('label');
                     card.className = 'project-onglet';
                     card.setAttribute('for', 'projectNav-'+projet.nom);
                     card.innerHTML = `<h3>${projet.nom}</h3>`;
                     card.innerHTML += `<p>${projet.description}</p>`;
+
+                    // Ajouter radio puis label dans le même conteneur
+                    projectsListOnglet.appendChild(radioPoint);
                     projectsListOnglet.appendChild(card);
                 });
             }
@@ -346,5 +346,178 @@ async function loadContent() {
     }
 }
 
+// --- Système Gamepad ---
+
+// Objet pour tracker les manettes connectées par leur index
+const connectedGamepads = {};
+let previousButtonStates = {};
+let pollingActive = false;
+
+function showGamepadButtons() {
+    console.log('Affichage des boutons gamepad');
+    const gamepadButtons = document.querySelectorAll('.gamepad_btn');
+    gamepadButtons.forEach(btn => {
+        btn.style.display = 'flex';
+    });
+}
+
+function hideGamepadButtons() {
+    console.log('Masquage des boutons gamepad');
+    const gamepadButtons = document.querySelectorAll('.gamepad_btn');
+    gamepadButtons.forEach(btn => {
+        btn.style.display = 'none';
+    });
+}
+
+// Fonction pour naviguer dans le carousel
+function navigateCarousel(direction) {
+    const navRadios = ['nav-accueil', 'nav-experiences', 'nav-projets'];
+
+    let currentIndex = navRadios.findIndex(id => document.getElementById(id).checked);
+    if (currentIndex === -1) currentIndex = 0;
+
+    let newIndex;
+    if (direction === 'left') {
+        newIndex = currentIndex > 0 ? currentIndex - 1 : navRadios.length - 1;
+    } else {
+        newIndex = currentIndex < navRadios.length - 1 ? currentIndex + 1 : 0;
+    }
+
+    const radioElement = document.getElementById(navRadios[newIndex]);
+    radioElement.checked = true;
+
+    const label = document.querySelector(`label[for="${navRadios[newIndex]}"]`);
+    if (label) {
+        label.focus();
+    }
+}
+
+// Fonction pour naviguer dans les projets
+function navigateProjects(direction) {
+    const projectRadios = document.querySelectorAll('input[name="projectNav"]');
+    if (projectRadios.length === 0) return;
+
+    let currentIndex = -1;
+    projectRadios.forEach((radio, index) => {
+        if (radio.checked) {
+            currentIndex = index;
+        }
+    });
+
+    if (currentIndex === -1) {
+        projectRadios[0].checked = true;
+        projectRadios[0].dispatchEvent(new Event('change'));
+        return;
+    }
+
+    let newIndex;
+    if (direction === 'up') {
+        newIndex = currentIndex > 0 ? currentIndex - 1 : projectRadios.length - 1;
+    } else {
+        newIndex = currentIndex < projectRadios.length - 1 ? currentIndex + 1 : 0;
+    }
+
+    projectRadios[newIndex].checked = true;
+    projectRadios[newIndex].dispatchEvent(new Event('change'));
+
+    const label = document.querySelector(`label[for="${projectRadios[newIndex].id}"]`);
+    if (label) {
+        label.focus();
+    }
+}
+
+// Fonction de polling pour détecter les pressions de boutons
+function pollGamepad() {
+    const gamepads = navigator.getGamepads();
+
+    for (let i = 0; i < gamepads.length; i++) {
+        const gamepad = gamepads[i];
+        if (gamepad && connectedGamepads[gamepad.index]) {
+            if (!previousButtonStates[gamepad.index]) {
+                previousButtonStates[gamepad.index] = [];
+            }
+
+            gamepad.buttons.forEach((button, buttonIndex) => {
+                const wasPressed = previousButtonStates[gamepad.index][buttonIndex] || false;
+                const isPressed = button.pressed;
+
+                if (isPressed && !wasPressed) {
+                    console.log(`Bouton ${buttonIndex} pressé`);
+
+                    if (buttonIndex === 4 || buttonIndex === 6) {
+                        navigateCarousel('left');
+                    } else if (buttonIndex === 5 || buttonIndex === 7) {
+                        navigateCarousel('right');
+                    } else if (buttonIndex === 12) {
+                        navigateProjects('up');
+                    } else if (buttonIndex === 13) {
+                        navigateProjects('down');
+                    }
+                }
+
+                previousButtonStates[gamepad.index][buttonIndex] = isPressed;
+            });
+        }
+    }
+
+    if (Object.keys(connectedGamepads).length > 0) {
+        requestAnimationFrame(pollGamepad);
+    } else {
+        pollingActive = false;
+    }
+}
+
+function connectGamepad(event) {
+    const gamepad = event.gamepad;
+    console.log('Manette connectée:', gamepad.id, 'à l\'index', gamepad.index);
+    connectedGamepads[gamepad.index] = gamepad;
+    showGamepadButtons();
+
+    if (!pollingActive) {
+        pollingActive = true;
+        requestAnimationFrame(pollGamepad);
+    }
+}
+
+function disconnectGamepad(event) {
+    const gamepad = event.gamepad;
+    console.log('Manette déconnectée:', gamepad.id, 'index', gamepad.index);
+    delete connectedGamepads[gamepad.index];
+    delete previousButtonStates[gamepad.index];
+
+    if (Object.keys(connectedGamepads).length === 0) {
+        hideGamepadButtons();
+    }
+}
+
+function checkGamepadOnLoad() {
+    if (!navigator.getGamepads) {
+        console.log('API Gamepad non supportée par ce navigateur');
+        return;
+    }
+
+    const gamepads = navigator.getGamepads();
+    for (let i = 0; i < gamepads.length; i++) {
+        if (gamepads[i] !== null) {
+            console.log('Manette trouvée à l\'index', i, ':', gamepads[i].id);
+            connectedGamepads[i] = gamepads[i];
+        }
+    }
+
+    if (Object.keys(connectedGamepads).length > 0) {
+        showGamepadButtons();
+        if (!pollingActive) {
+            pollingActive = true;
+            requestAnimationFrame(pollGamepad);
+        }
+    }
+}
+
 // Attendre que le DOM soit chargé
-document.addEventListener('DOMContentLoaded', loadContent);
+document.addEventListener('DOMContentLoaded', () => {
+    loadContent();
+    checkGamepadOnLoad();
+});
+
+window.addEventListener("gamepadconnected", connectGamepad);
+window.addEventListener("gamepaddisconnected", disconnectGamepad);
