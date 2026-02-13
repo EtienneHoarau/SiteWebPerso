@@ -337,6 +337,17 @@ async function loadContent() {
                 }
             });
 
+            // Exposer la navigation pour le gamepad
+            window.navigateExperiences = (direction) => {
+                if (direction === 'up' && currentIndex > 0) {
+                    currentIndex--;
+                    updateCarousel();
+                } else if (direction === 'down' && currentIndex < expEntries.length - 1) {
+                    currentIndex++;
+                    updateCarousel();
+                }
+            };
+
             // Initialiser l'affichage
             updateCarousel();
         }
@@ -450,6 +461,10 @@ function pollGamepad() {
                         navigateProjects('up');
                     } else if (buttonIndex === 13 && document.getElementById("nav-projets").checked) {
                         navigateProjects('down');
+                    } else if (buttonIndex === 12 && document.getElementById("nav-experiences").checked && window.navigateExperiences) {
+                        window.navigateExperiences('up');
+                    } else if (buttonIndex === 13 && document.getElementById("nav-experiences").checked && window.navigateExperiences) {
+                        window.navigateExperiences('down');
                     }
                 }
 
