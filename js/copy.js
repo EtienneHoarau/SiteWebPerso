@@ -1,5 +1,7 @@
 // Script uniquement pour le chargement des données JSON
 
+var competencesList = [];
+
 // Fonction pour accéder à une propriété imbriquée via une chaîne "a.b.c"
 function getNestedValue(obj, path) {
     return path.split('.').reduce((current, key) => current?.[key], obj);
@@ -40,6 +42,72 @@ async function loadContent() {
         const response = await fetch('data/content.json');
         const data = await response.json();
 
+        var filterList = [];
+        
+        
+        Object.values(data.projets || {}).forEach(projet => {
+            if (Array.isArray(projet.competences)) {
+                projet.competences.forEach(competence => {
+                    if (!competencesList.includes(competence)) {
+                        competencesList.push(competence);
+                    }
+                });
+            }
+        });
+
+        const projets = Object.values(data.projets || {});
+
+        const filterButton = document.querySelector('.filter-button');
+        const filterOptions = document.querySelector('.filter-options');
+
+        if (filterButton && filterOptions) {
+            filterButton.addEventListener('click', () => {
+                const isOpen = filterOptions.classList.toggle('is-open');
+                filterOptions.setAttribute('aria-hidden', String(!isOpen));
+            });
+        }
+
+        const updateProjectVisibility = () => {
+            document.querySelectorAll('.project-onglet').forEach(onglet => {
+                const radio = document.getElementById(onglet.getAttribute('for'));
+                const projectName = radio?.id?.replace('projectNav-', '') || '';
+                const projet = projets.find(p => p.nom === projectName.replace(/-/g, ' '));
+
+                if (!projet) {
+                    onglet.style.display = 'none';
+                    return;
+                }
+
+                const matchesFilters = filterList.length === 0 || filterList.some(selectedCompetence =>
+                    projet.competences?.includes(selectedCompetence)
+                );
+
+                onglet.style.display = matchesFilters ? 'block' : 'none';
+            });
+        };
+
+        document.querySelectorAll('.filter-options').forEach(filterContainer => {
+            competencesList.forEach(competence => {
+                const button = document.createElement('button');
+                button.className = 'filter-option';
+                button.textContent = competence;
+                button.style.backgroundColor = '#3498db'; // Couleur de fond par défaut
+
+                let isSelected = false;
+                button.addEventListener('click', () => {
+                    filterList = filterList.includes(competence)
+                        ? filterList.filter(c => c !== competence)
+                        : [...filterList, competence];
+
+                    isSelected = !isSelected;
+                    button.style.backgroundColor = isSelected ? '#BE1818' : '#3498db';
+                    updateProjectVisibility();
+                    console.log('Filtres sélectionnés:', filterList);
+                });
+                filterContainer.appendChild(button);
+            });
+        });
+
         // Appliquer le contenu textuel
         document.querySelectorAll('[data-content]').forEach(element => {
             const path = element.getAttribute('data-content');
@@ -79,7 +147,7 @@ async function loadContent() {
             const projectsListOnglet = document.querySelector('.projects-list');
             var card = false;
             if (projectList && card) {
-                Object.values(data.projets).forEach(projet => {
+                projets.forEach(projet => {
                     const card = document.createElement('div');
                     card.className = 'project-card';
                     card.innerHTML = `<h3>${projet.nom}</h3>`;
@@ -90,7 +158,7 @@ async function loadContent() {
             if (projectsListOnglet && !card) {
                 const projectDescription = document.querySelector('.project-description');
 
-                Object.values(data.projets).forEach(projet => {
+                projets.forEach(projet => {
                     // create radio btn
                     const radioPoint = document.createElement('input');
                     radioPoint.type = 'radio';
@@ -188,13 +256,17 @@ async function loadContent() {
                     const card = document.createElement('label');
                     card.className = 'project-onglet';
                     card.setAttribute('for', 'projectNav-'+projet.nom);
+                    const description = projet.description ? `${projet.description.substring(0, 50)}${projet.description.length > 20 ? '...' : ''}` : '';
                     card.innerHTML = `<h3>${projet.nom}</h3>`;
-                    card.innerHTML += `<p>${projet.description}</p>`;
+                    card.innerHTML += `<p>${description}</p>`;
+                    card.style.display = 'block';
 
                     // Ajouter radio puis label dans le même conteneur
                     projectsListOnglet.appendChild(radioPoint);
                     projectsListOnglet.appendChild(card);
                 });
+
+                updateProjectVisibility();
             }
 
         }
