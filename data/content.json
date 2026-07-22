@@ -17,7 +17,7 @@
     "profil": {
         "nom": "Etienne Hoarau",
         "titre": "Ingénieur Audiovisuel & Multimédia",
-        "description": "Jeune cadre jeune et dynamique mais avec de l'humour (askip )",
+        "description": "Diplomé ingénieur de l'INSA Hauts-de-France en audiovisuel & multimédia. Je me concentre sur les domaines du traitement d'images, de l'IA et de la 3D. Fort de mon orginilité et de ma capacité à travailler en équipe, les différents projets que je mène ont pour but de développer des outils en accord avec mes principes. ",
         "photo": "assets/images/photo_CV.jpeg",
         "liens": {
             "email": "hoarau.etienne.luc@ikmail.com",
@@ -97,7 +97,7 @@
     "projets" :{
         "ACADIA":{
             "nom": "ACADIA",
-            "description": "Auto encodeur pour nanana.",
+            "description": "Projet universitaire en équipe, visant la création de divers modèles d'autoencodeur. Ceux-ci afin de rechercher les applications possibles dans les domaines du débruitage, de la compression des images ainsi que la recherche d'anomalie. Ce projet a nécessité en plus la création d'un jeu de donnée personnalisé.",
             "collaborateurs": ["Charles Dijon","Arnaud Lefebvre","Antoine Chevallet"],
             "liens": [
                 {
@@ -114,7 +114,7 @@
         },
         "StageCraft":{
             "nom": "Laura Craft",
-            "description": "StageCraft",
+            "description": "Manager une équipe et la création d'un système de StageCraft via l'outil Blender pour de l'intégration vidéo en temps réel. Ceci avait pour but de créer un environnement remplaçant le fond vert de l'UPHF pour tourner des vidéos sans problèmes de réflexion lumineuse.",
             "collaborateurs": ["Promo AVM 2025"],
             "liens": [],
             "competences":[
@@ -123,7 +123,7 @@
         },
         "HADA Games":{
             "nom": "HADA",
-            "description": "jeu vidéo réalisé pour les cours ",
+            "description": "Jeu réalisé pour un projet de cours afin de découvrir le logiciel Unity et les moteurs 3D en général.",
             "collaborateurs": ["Julien Ganne"],
             "liens": [],
             "competences": [
@@ -134,7 +134,7 @@
         },
         "AVM_mini_games":{
             "nom":"Beer pong",
-            "description":"Mini jeu de beer pong pour un projet de cours",
+            "description":"Mini jeu de beer pong pour un projet de cours. Chacun devait crée un mini-jeu permettant une partie a 1 joueur contre 1 joueur.",
             "collaborateurs": ["Matthieu Phosanarack"],
             "liens": [],
             "competences": [
