@@ -17,7 +17,7 @@
     "profil": {
         "nom": "Etienne Hoarau",
         "titre": "Ingénieur Audiovisuel & Multimédia",
-        "description": "Diplomé ingénieur de l'INSA Hauts-de-France en audiovisuel & multimédia. Je me concentre sur les domaines du traitement d'images, de l'IA et de la 3D. Fort de mon orginilité et de ma capacité à travailler en équipe, les différents projets que je mène ont pour but de développer des outils en accord avec mes principes. ",
+        "description": "Diplomé ingénieur de l'INSA Hauts-de-France en audiovisuel & multimédia. Je me concentre sur les domaines du traitement d'images, de l'IA et de la 3D. Fort de mon originalité et de ma capacité à travailler en équipe, les différents projets que je mène ont pour but de développer des outils en accord avec mes principes. ",
         "photo": "assets/images/photo_CV.jpeg",
         "liens": {
             "email": "hoarau.etienne.luc@ikmail.com",
@@ -97,7 +97,7 @@
     "projets" :{
         "ACADIA":{
             "nom": "ACADIA",
-            "description": "Projet universitaire en équipe, visant la création de divers modèles d'autoencodeur. Ceux-ci afin de rechercher les applications possibles dans les domaines du débruitage, de la compression des images ainsi que la recherche d'anomalie. Ce projet a nécessité en plus la création d'un jeu de donnée personnalisé.",
+            "description": "Projet universitaire en équipe, visant la création de divers modèles d'autoencodeur. Ceci afin de rechercher les applications possibles dans les domaines du débruitage, de la compression des images ainsi que la recherche d'anomalie. Ce projet a nécessité en plus la création d'un jeu de donnée personnalisé.",
             "collaborateurs": ["Charles Dijon","Arnaud Lefebvre","Antoine Chevallet"],
             "liens": [
                 {
@@ -134,7 +134,7 @@
         },
         "AVM_mini_games":{
             "nom":"Beer pong",
-            "description":"Mini jeu de beer pong pour un projet de cours. Chacun devait crée un mini-jeu permettant une partie a 1 joueur contre 1 joueur.",
+            "description":"Mini jeu de beer pong pour un projet de cours. Chacun devait crée un mini-jeu permettant une partie à 1 joueur contre 1 joueur.",
             "collaborateurs": ["Matthieu Phosanarack"],
             "liens": [],
             "competences": [
