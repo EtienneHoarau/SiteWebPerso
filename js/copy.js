@@ -465,7 +465,6 @@ async function loadProjects() {
   let filterList = [];
 
   const filterButton = document.querySelector(".filter-button");
-
   const filterOptions = document.querySelector(".filter-options");
 
   if (filterButton && filterOptions) {
@@ -486,15 +485,18 @@ async function loadProjects() {
 
       if (!projet) {
         onglet.style.display = "none";
-
         return;
       }
 
-      const competenceIds = (projet.competences || []).map((c) => String(c.id));
+      const competenceIds = (projet.competences || []).map((c) =>
+        String(c.id),
+      );
 
       const matchesFilters =
         filterList.length === 0 ||
-        filterList.some((selectedId) => competenceIds.includes(selectedId));
+        filterList.some((selectedId) =>
+          competenceIds.includes(selectedId),
+        );
 
       onglet.style.display = matchesFilters ? "block" : "none";
     });
@@ -507,11 +509,8 @@ async function loadProjects() {
       const button = document.createElement("button");
 
       button.className = "filter-option";
-
       button.textContent = competence.name;
-
       button.dataset.competenceId = competenceId;
-
       button.style.backgroundColor = "#3498db";
 
       let isSelected = false;
@@ -523,7 +522,9 @@ async function loadProjects() {
 
         isSelected = !isSelected;
 
-        button.style.backgroundColor = isSelected ? "#BE1818" : "#3498db";
+        button.style.backgroundColor = isSelected
+          ? "#BE1818"
+          : "#3498db";
 
         updateProjectVisibility();
 
@@ -535,7 +536,6 @@ async function loadProjects() {
   });
 
   const projectList = document.querySelector(".project-list");
-
   const projectsListOnglet = document.querySelector(".projects-list");
 
   const card = false;
@@ -561,11 +561,8 @@ async function loadProjects() {
       const radioPoint = document.createElement("input");
 
       radioPoint.type = "radio";
-
       radioPoint.name = "projectNav";
-
       radioPoint.className = "nav-project-radio";
-
       radioPoint.id = "projectNav-" + projet.id;
 
       radioPoint.addEventListener("change", () => {
@@ -577,149 +574,149 @@ async function loadProjects() {
 
         if (projet.collaborators && projet.collaborators.length > 0) {
           collaborateursHTML = `
-                <div class="collaborateurs-section">
-                  <p>
-                    <strong>
-                      Collaborateurs:
-                    </strong>
-                  </p>
+            <div class="collaborateurs-section">
+              <p>
+                <strong>
+                  Collaborateurs:
+                </strong>
+              </p>
 
-                  <div class="collaborateurs-cards">
-                    ${projet.collaborators
-                      .map((collab) => {
-                        if (collab.links && collab.links.length > 0) {
-                          const url = buildLinkUrl(collab.links[0].url);
+              <div class="collaborateurs-cards">
+                ${projet.collaborators
+                  .map((collab) => {
+                    if (collab.links && collab.links.length > 0) {
+                      const url = buildLinkUrl(collab.links[0].url);
 
-                          return `
-                            <a
-                              href="${url}"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="collaborateur-card"
-                            >
-                              ${collab.name}
-                            </a>
-                          `;
-                        }
+                      return `
+                        <a
+                          href="${url}"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="collaborateur-card"
+                        >
+                          ${collab.name}
+                        </a>
+                      `;
+                    }
 
-                        return `
-                          <span
-                            class="collaborateur-card collaborateur-card-no-link"
-                          >
-                            ${collab.name}
-                          </span>
-                        `;
-                      })
-                      .join("")}
-                  </div>
-                </div>
-              `;
+                    return `
+                      <span
+                        class="collaborateur-card collaborateur-card-no-link"
+                      >
+                        ${collab.name}
+                      </span>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            </div>
+          `;
         }
 
         let liensHTML = "";
 
         if (projet.links && projet.links.length > 0) {
           liensHTML = `
-                <div class="liens-section">
-                  <p>
-                    <strong>
-                      Liens:
-                    </strong>
-                  </p>
+            <div class="liens-section">
+              <p>
+                <strong>
+                  Liens:
+                </strong>
+              </p>
 
-                  <div class="liens-cards">
-                    ${projet.links
-                      .map((lien) => {
-                        const url = buildLinkUrl(lien.url);
+              <div class="liens-cards">
+                ${projet.links
+                  .map((lien) => {
+                    const url = buildLinkUrl(lien.url);
+                    const icon = lien.icon
+                      ? cleanUrl(lien.icon)
+                      : null;
 
-                        const icon = lien.icon ? cleanUrl(lien.icon) : null;
+                    return `
+                      <a
+                        href="${url}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="lien-card"
+                        data-type="${icon ? "image" : "link"}"
+                      >
+                        ${
+                          icon
+                            ? `
+                              <span class="lien-icon">
+                                <img
+                                  src="${icon}"
+                                  alt="${lien.name || "Lien"}"
+                                  class="lien-icon-img"
+                                >
+                              </span>
+                            `
+                            : ""
+                        }
 
-                        return `
-                          <a
-                            href="${url}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="lien-card"
-                            data-type="${icon ? "image" : "link"}"
-                          >
-                            ${
-                              icon
-                                ? `
-                                  <img
-                                    src="${icon}"
-                                    alt="${lien.name || "Lien"}"
-                                    class="lien-icon-img"
-                                  >
-                                `
-                                : `
-                                  <span class="lien-icon">
-                                    ${lien.name || "Lien"}
-                                  </span>
-                                `
-                            }
-
-                            <span class="lien-nom">
-                              ${lien.name || "Lien"}
-                            </span>
-                          </a>
-                        `;
-                      })
-                      .join("")}
-                  </div>
-                </div>
-              `;
+                        <span class="lien-nom">
+                          ${lien.name || "Lien"}
+                        </span>
+                      </a>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            </div>
+          `;
         }
 
         let competencesHTML = "";
 
         if (projet.competences && projet.competences.length > 0) {
           competencesHTML = `
-                <div class="competences-section">
-                  <p>
-                    <strong>
-                      Compétences:
-                    </strong>
-                  </p>
+            <div class="competences-section">
+              <p>
+                <strong>
+                  Compétences:
+                </strong>
+              </p>
 
-                  <div class="competences-cards">
-                    ${projet.competences
-                      .map(
-                        (competence) => `
-                          <span
-                            class="competence-card"
-                          >
-                            ${competence.name}
-                          </span>
-                        `,
-                      )
-                      .join("")}
-                  </div>
-                </div>
-              `;
+              <div class="competences-cards">
+                ${projet.competences
+                  .map(
+                    (competence) => `
+                      <span class="competence-card">
+                        ${competence.name}
+                      </span>
+                    `,
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `;
         }
 
         projectDescription.innerHTML = `
-              <h2>
-                ${projet.name}
-              </h2>
+          <h2>
+            ${projet.name}
+          </h2>
 
-              <p>
-                ${projet.description}
-              </p>
+          <p>
+            ${projet.description}
+          </p>
 
-              ${collaborateursHTML}
+          ${collaborateursHTML}
 
-              ${liensHTML}
+          ${liensHTML}
 
-              ${competencesHTML}
-            `;
+          ${competencesHTML}
+        `;
       });
 
       const projectCard = document.createElement("label");
 
       projectCard.className = "project-onglet";
 
-      projectCard.setAttribute("for", "projectNav-" + projet.id);
+      projectCard.setAttribute(
+        "for",
+        "projectNav-" + projet.id,
+      );
 
       const description = projet.description
         ? `${projet.description.substring(0, 50)}${
@@ -728,19 +725,18 @@ async function loadProjects() {
         : "";
 
       projectCard.innerHTML = `
-          <h3>
-            ${projet.name}
-          </h3>
+        <h3>
+          ${projet.name}
+        </h3>
 
-          <p>
-            ${description}
-          </p>
-        `;
+        <p>
+          ${description}
+        </p>
+      `;
 
       projectCard.style.display = "block";
 
       projectsListOnglet.appendChild(radioPoint);
-
       projectsListOnglet.appendChild(projectCard);
     });
 
