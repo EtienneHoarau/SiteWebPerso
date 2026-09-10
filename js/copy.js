@@ -2,327 +2,378 @@
 
 var competencesList = [];
 
+// TOKEN
+const SUPABASE_URL = "https://zrmqjigijvowczychcud.supabase.co";
+const SUPABASE_KEY = "sb_publishable_-3c7PHAuezwlOSgv-sa0vA_L7Hho4F6";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function getProjects() {
+  console.log("Appel de get_projects()...");
+
+  const { data, error } = await supabaseClient.rpc("get_projects");
+
+  console.log("Supabase data :", data);
+  console.log("Supabase error :", error);
+
+  if (error) {
+    throw error;
+  }
+
+  return data || [];
+}
+
 // Fonction pour accéder à une propriété imbriquée via une chaîne "a.b.c"
 function getNestedValue(obj, path) {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+  return path.split(".").reduce((current, key) => current?.[key], obj);
 }
 
 // Parser les dates mixtes (année seule ou "Mois Année" en français)
 function parseExperienceDate(dateStr, isEnd = true) {
-    const frenchMonths = {
-        'janvier': 0, 'février': 1, 'mars': 2, 'avril': 3,
-        'mai': 4, 'juin': 5, 'juillet': 6, 'août': 7,
-        'septembre': 8, 'octobre': 9, 'novembre': 10, 'décembre': 11
-    };
+  const frenchMonths = {
+    janvier: 0,
+    février: 1,
+    mars: 2,
+    avril: 3,
+    mai: 4,
+    juin: 5,
+    juillet: 6,
+    août: 7,
+    septembre: 8,
+    octobre: 9,
+    novembre: 10,
+    décembre: 11,
+  };
 
-    const trimmed = dateStr.trim();
+  const trimmed = dateStr.trim();
 
-    // Année seule (ex: "2020") → fin d'année si isEnd, début d'année sinon
-    if (/^\d{4}$/.test(trimmed)) {
-        const year = parseInt(trimmed);
-        return isEnd ? new Date(year, 11, 31) : new Date(year, 0, 1);
+  // Année seule (ex: "2020") → fin d'année si isEnd, début d'année sinon
+  if (/^\d{4}$/.test(trimmed)) {
+    const year = parseInt(trimmed);
+    return isEnd ? new Date(year, 11, 31) : new Date(year, 0, 1);
+  }
+
+  // "Mois Année" en français (ex: "Septembre 2023")
+  const parts = trimmed.split(" ");
+  if (parts.length === 2) {
+    const month = frenchMonths[parts[0].toLowerCase()];
+    const year = parseInt(parts[1]);
+    if (month !== undefined && !isNaN(year)) {
+      return new Date(year, month, 1);
     }
+  }
 
-    // "Mois Année" en français (ex: "Septembre 2023")
-    const parts = trimmed.split(' ');
-    if (parts.length === 2) {
-        const month = frenchMonths[parts[0].toLowerCase()];
-        const year = parseInt(parts[1]);
-        if (month !== undefined && !isNaN(year)) {
-            return new Date(year, month, 1);
-        }
-    }
-
-    return new Date(0);
+  return new Date(0);
 }
 
 // Charger et appliquer les données JSON
 async function loadContent() {
+  try {
+    const response = await fetch("data/content.json");
+    const data = await response.json();
+
+    var filterList = [];
+
+    // Récupération des projets depuis l'API Supabase
+    let projets = [];
     try {
-        const response = await fetch('data/content.json');
-        const data = await response.json();
+      projets = await getProjects();
+    } catch (apiError) {
+      console.error("Erreur lors du chargement des projets depuis Supabase:", apiError);
+      projets = [];
+    }
 
-        var filterList = [];
-        
-        
-        Object.values(data.projets || {}).forEach(projet => {
-            if (Array.isArray(projet.competences)) {
-                projet.competences.forEach(competence => {
-                    if (!competencesList.includes(competence)) {
-                        competencesList.push(competence);
-                    }
-                });
-            }
+    // Construire la liste des compétences (pour les filtres) à partir des projets de l'API
+    projets.forEach((projet) => {
+      if (Array.isArray(projet.competences)) {
+        projet.competences.forEach((competence) => {
+          const nom = competence?.name;
+          if (nom && !competencesList.includes(nom)) {
+            competencesList.push(nom);
+          }
         });
+      }
+    });
 
-        const projets = Object.values(data.projets || {});
+    const filterButton = document.querySelector(".filter-button");
+    const filterOptions = document.querySelector(".filter-options");
 
-        const filterButton = document.querySelector('.filter-button');
-        const filterOptions = document.querySelector('.filter-options');
+    if (filterButton && filterOptions) {
+      filterButton.addEventListener("click", () => {
+        const isOpen = filterOptions.classList.toggle("is-open");
+        filterOptions.setAttribute("aria-hidden", String(!isOpen));
+      });
+    }
 
-        if (filterButton && filterOptions) {
-            filterButton.addEventListener('click', () => {
-                const isOpen = filterOptions.classList.toggle('is-open');
-                filterOptions.setAttribute('aria-hidden', String(!isOpen));
-            });
+    const updateProjectVisibility = () => {
+      document.querySelectorAll(".project-onglet").forEach((onglet) => {
+        const radio = document.getElementById(onglet.getAttribute("for"));
+        const projectId = radio?.id?.replace("projectNav-", "") || "";
+        const projet = projets.find((p) => String(p.id) === projectId);
+
+        if (!projet) {
+          onglet.style.display = "none";
+          return;
         }
 
-        const updateProjectVisibility = () => {
-            document.querySelectorAll('.project-onglet').forEach(onglet => {
-                const radio = document.getElementById(onglet.getAttribute('for'));
-                const projectName = radio?.id?.replace('projectNav-', '') || '';
-                const projet = projets.find(p => p.nom === projectName.replace(/-/g, ' '));
+        const matchesFilters =
+          filterList.length === 0 ||
+          filterList.some((selectedCompetence) =>
+            projet.competences?.some((c) => c.name === selectedCompetence),
+          );
 
-                if (!projet) {
-                    onglet.style.display = 'none';
-                    return;
-                }
+        onglet.style.display = matchesFilters ? "block" : "none";
+      });
+    };
 
-                const matchesFilters = filterList.length === 0 || filterList.some(selectedCompetence =>
-                    projet.competences?.includes(selectedCompetence)
-                );
+    document.querySelectorAll(".filter-options").forEach((filterContainer) => {
+      competencesList.forEach((competence) => {
+        const button = document.createElement("button");
+        button.className = "filter-option";
+        button.textContent = competence;
+        button.style.backgroundColor = "#3498db"; // Couleur de fond par défaut
 
-                onglet.style.display = matchesFilters ? 'block' : 'none';
-            });
-        };
+        let isSelected = false;
+        button.addEventListener("click", () => {
+          filterList = filterList.includes(competence)
+            ? filterList.filter((c) => c !== competence)
+            : [...filterList, competence];
 
-        document.querySelectorAll('.filter-options').forEach(filterContainer => {
-            competencesList.forEach(competence => {
-                const button = document.createElement('button');
-                button.className = 'filter-option';
-                button.textContent = competence;
-                button.style.backgroundColor = '#3498db'; // Couleur de fond par défaut
-
-                let isSelected = false;
-                button.addEventListener('click', () => {
-                    filterList = filterList.includes(competence)
-                        ? filterList.filter(c => c !== competence)
-                        : [...filterList, competence];
-
-                    isSelected = !isSelected;
-                    button.style.backgroundColor = isSelected ? '#BE1818' : '#3498db';
-                    updateProjectVisibility();
-                    console.log('Filtres sélectionnés:', filterList);
-                });
-                filterContainer.appendChild(button);
-            });
+          isSelected = !isSelected;
+          button.style.backgroundColor = isSelected ? "#BE1818" : "#3498db";
+          updateProjectVisibility();
+          console.log("Filtres sélectionnés:", filterList);
         });
+        filterContainer.appendChild(button);
+      });
+    });
 
-        // Appliquer le contenu textuel
-        document.querySelectorAll('[data-content]').forEach(element => {
-            const path = element.getAttribute('data-content');
-            const value = getNestedValue(data, path);
-            if (value) {
-                element.textContent = value;
-            }
+    // Appliquer le contenu textuel
+    document.querySelectorAll("[data-content]").forEach((element) => {
+      const path = element.getAttribute("data-content");
+      const value = getNestedValue(data, path);
+      if (value) {
+        element.textContent = value;
+      }
+    });
+
+    // Appliquer les sources d'images
+    document.querySelectorAll("[data-src]").forEach((element) => {
+      const path = element.getAttribute("data-src");
+      const value = getNestedValue(data, path);
+      if (value) {
+        element.src = value;
+      }
+    });
+
+    // Appliquer les liens
+    document.querySelectorAll("[data-href]").forEach((element) => {
+      const path = element.getAttribute("data-href");
+      const prefix = element.getAttribute("data-href-prefix") || "";
+      const value = getNestedValue(data, path);
+      if (value) {
+        element.href = prefix + value;
+      }
+    });
+
+    // Mettre à jour le titre de la page
+    if (data.site?.title) {
+      document.title = data.site.title;
+    }
+
+    // Générer les cartes de projets (à partir des données de l'API)
+    if (projets.length > 0) {
+      const projectList = document.querySelector(".project-list");
+      const projectsListOnglet = document.querySelector(".projects-list");
+      var card = false;
+      if (projectList && card) {
+        projets.forEach((projet) => {
+          const card = document.createElement("div");
+          card.className = "project-card";
+          card.innerHTML = `<h3>${projet.name}</h3>`;
+          card.innerHTML += `<p>${projet.description}</p>`;
+          projectList.appendChild(card);
         });
+      }
+      if (projectsListOnglet && !card) {
+        const projectDescription = document.querySelector(
+          ".project-description",
+        );
 
-        // Appliquer les sources d'images
-        document.querySelectorAll('[data-src]').forEach(element => {
-            const path = element.getAttribute('data-src');
-            const value = getNestedValue(data, path);
-            if (value) {
-                element.src = value;
-            }
-        });
+        projets.forEach((projet) => {
+          // create radio btn
+          const radioPoint = document.createElement("input");
+          radioPoint.type = "radio";
+          radioPoint.name = "projectNav";
+          radioPoint.className = "nav-project-radio";
+          radioPoint.id = "projectNav-" + projet.id;
 
-        // Appliquer les liens
-        document.querySelectorAll('[data-href]').forEach(element => {
-            const path = element.getAttribute('data-href');
-            const prefix = element.getAttribute('data-href-prefix') || '';
-            const value = getNestedValue(data, path);
-            if (value) {
-                element.href = prefix + value;
-            }
-        });
-
-        // Mettre à jour le titre de la page
-        if (data.site?.title) {
-            document.title = data.site.title;
-        }
-
-        // Générer les cartes de projets
-        if (data.projets) {
-            const projectList = document.querySelector('.project-list');
-            const projectsListOnglet = document.querySelector('.projects-list');
-            var card = false;
-            if (projectList && card) {
-                projets.forEach(projet => {
-                    const card = document.createElement('div');
-                    card.className = 'project-card';
-                    card.innerHTML = `<h3>${projet.nom}</h3>`;
-                    card.innerHTML += `<p>${projet.description}</p>`;
-                    projectList.appendChild(card);
-                });
-            }
-            if (projectsListOnglet && !card) {
-                const projectDescription = document.querySelector('.project-description');
-
-                projets.forEach(projet => {
-                    // create radio btn
-                    const radioPoint = document.createElement('input');
-                    radioPoint.type = 'radio';
-                    radioPoint.name= 'projectNav';
-                    radioPoint.className='nav-project-radio'
-                    radioPoint.id='projectNav-'+projet.nom;
-
-                    // Ajouter un écouteur d'événement pour mettre à jour la description
-                    radioPoint.addEventListener('change', () => {
-                        if (radioPoint.checked && projectDescription) {
-                            // Générer les cartes de collaborateurs
-                            let collaborateursHTML = '';
-                            if (projet.collaborateurs) {
-                                const collabList = Array.isArray(projet.collaborateurs)
-                                    ? projet.collaborateurs
-                                    : projet.collaborateurs.split(',').map(c => c.trim());
-
-                                collaborateursHTML = `
+          // Ajouter un écouteur d'événement pour mettre à jour la description
+          radioPoint.addEventListener("change", () => {
+            if (radioPoint.checked && projectDescription) {
+              // Générer les cartes de collaborateurs
+              let collaborateursHTML = "";
+              if (projet.collaborators && projet.collaborators.length > 0) {
+                collaborateursHTML = `
                                     <div class="collaborateurs-section">
                                         <p><strong>Collaborateurs:</strong></p>
                                         <div class="collaborateurs-cards">
-                                            ${collabList.map(collab => {
-                                                // Récupérer le LinkedIn du collaborateur depuis data.collaborateurs
-                                                const collabInfo = data.collaborateurs?.[collab];
-                                                const linkedinUrl = collabInfo?.linkedin;
+                                            ${projet.collaborators
+                                              .map((collab) => {
+                                                const linkedinUrl = collab.link;
 
-                                                // Si le LinkedIn existe et n'est pas vide, créer un lien
-                                                if (linkedinUrl && linkedinUrl !== '') {
-                                                    return `
+                                                // Si le lien existe et n'est pas vide, créer un lien
+                                                if (
+                                                  linkedinUrl &&
+                                                  linkedinUrl !== ""
+                                                ) {
+                                                  return `
                                                         <a href="${linkedinUrl}" target="_blank" class="collaborateur-card">
-                                                            ${collab}
+                                                            ${collab.name}
                                                         </a>
                                                     `;
                                                 } else {
-                                                    // Sinon, créer juste un span non cliquable
-                                                    return `
+                                                  // Sinon, créer juste un span non cliquable
+                                                  return `
                                                         <span class="collaborateur-card collaborateur-card-no-link">
-                                                            ${collab}
+                                                            ${collab.name}
                                                         </span>
                                                     `;
                                                 }
-                                            }).join('')}
+                                              })
+                                              .join("")}
                                         </div>
                                     </div>
                                 `;
-                            }
+              }
 
-                            // Générer les liens du projet
-                            let liensHTML = '';
-                            if (projet.liens && projet.liens.length > 0) {
-                                liensHTML = `
+              // Générer les liens du projet (si l'API les fournit un jour)
+              let liensHTML = "";
+              if (projet.liens && projet.liens.length > 0) {
+                liensHTML = `
                                     <div class="liens-section">
                                         <p><strong>Liens:</strong></p>
                                         <div class="liens-cards">
-                                            ${projet.liens.map(lien => `
-                                                <a href="${lien.url}" target="_blank" class="lien-card" data-type="${lien.icone || 'link'}">
-                                                    ${lien.icone
+                                            ${projet.liens
+                                              .map(
+                                                (lien) => `
+                                                <a href="${lien.url}" target="_blank" class="lien-card" data-type="${lien.icone || "link"}">
+                                                    ${
+                                                      lien.icone
                                                         ? `<img src="${lien.icone}" alt="${lien.nom}" class="lien-icon-img">`
                                                         : `<span class="lien-icon">${lien.nom}</span>`
                                                     }
                                                     <span class="lien-nom">${lien.nom}</span>
                                                 </a>
-                                            `).join('')}
+                                            `,
+                                              )
+                                              .join("")}
                                         </div>
                                     </div>
                                 `;
-                            }
+              }
 
-                            // Générer les cartes de compétences
-                            let competencesHTML = '';
-                            if (projet.competences && projet.competences.length > 0) {
-                                competencesHTML = `
+              // Générer les cartes de compétences
+              let competencesHTML = "";
+              if (projet.competences && projet.competences.length > 0) {
+                competencesHTML = `
                                     <div class="competences-section">
                                         <p><strong>Compétences:</strong></p>
                                         <div class="competences-cards">
-                                            ${projet.competences.map(competence => `
-                                                <span class="competence-card">${competence}</span>
-                                            `).join('')}
+                                            ${projet.competences
+                                              .map(
+                                                (competence) => `
+                                                <span class="competence-card">${competence.name}</span>
+                                            `,
+                                              )
+                                              .join("")}
                                         </div>
                                     </div>
                                 `;
-                            }
+              }
 
-                            projectDescription.innerHTML = `
-                                <h2>${projet.nom}</h2>
+              projectDescription.innerHTML = `
+                                <h2>${projet.name}</h2>
                                 <p>${projet.description}</p>
                                 ${collaborateursHTML}
                                 ${liensHTML}
                                 ${competencesHTML}
                             `;
-                        }
-                    });
-
-                    // create project card
-                    const card = document.createElement('label');
-                    card.className = 'project-onglet';
-                    card.setAttribute('for', 'projectNav-'+projet.nom);
-                    const description = projet.description ? `${projet.description.substring(0, 50)}${projet.description.length > 20 ? '...' : ''}` : '';
-                    card.innerHTML = `<h3>${projet.nom}</h3>`;
-                    card.innerHTML += `<p>${description}</p>`;
-                    card.style.display = 'block';
-
-                    // Ajouter radio puis label dans le même conteneur
-                    projectsListOnglet.appendChild(radioPoint);
-                    projectsListOnglet.appendChild(card);
-                });
-
-                updateProjectVisibility();
             }
+          });
 
+          // create project card
+          const card = document.createElement("label");
+          card.className = "project-onglet";
+          card.setAttribute("for", "projectNav-" + projet.id);
+          const description = projet.description
+            ? `${projet.description.substring(0, 50)}${projet.description.length > 20 ? "..." : ""}`
+            : "";
+          card.innerHTML = `<h3>${projet.name}</h3>`;
+          card.innerHTML += `<p>${description}</p>`;
+          card.style.display = "block";
+
+          // Ajouter radio puis label dans le même conteneur
+          projectsListOnglet.appendChild(radioPoint);
+          projectsListOnglet.appendChild(card);
+        });
+
+        updateProjectVisibility();
+      }
+    }
+
+    // Générer le carousel vertical des expériences
+    if (data.experiences) {
+      const experiencesSection = document.querySelector("#experiences");
+      const placeholder = experiencesSection.querySelector("p");
+      if (placeholder) placeholder.remove();
+
+      // Convertir en tableau et trier par date de début décroissante
+      const expEntries = Object.entries(data.experiences).map(([key, exp]) => ({
+        key,
+        ...exp,
+        _endDate: parseExperienceDate(exp.fin, true),
+        _startDate: parseExperienceDate(exp.debut, false),
+      }));
+
+      expEntries.sort((a, b) => {
+        const startDiff = b._startDate - a._startDate;
+        if (startDiff !== 0) return startDiff;
+        return b._endDate - a._endDate;
+      });
+
+      // Créer le conteneur
+      const container = document.createElement("div");
+      container.className = "timeline-container";
+
+      const bar = document.createElement("div");
+      bar.className = "timeline-bar";
+      container.appendChild(bar);
+
+      const viewport = document.createElement("div");
+      viewport.className = "timeline-viewport";
+
+      // Générer le HTML de chaque carte
+      function buildCardHTML(exp) {
+        let entrepriseHTML = exp.lien
+          ? `<a href="${exp.lien}" target="_blank">${exp.entreprise}</a>`
+          : exp.entreprise;
+
+        let infoSupHTML = "";
+        if (exp.infoSup) {
+          infoSupHTML = `<p class="timeline-info-sup">${exp.infoSup}</p>`;
         }
 
-        // Générer le carousel vertical des expériences
-        if (data.experiences) {
-            const experiencesSection = document.querySelector('#experiences');
-            const placeholder = experiencesSection.querySelector('p');
-            if (placeholder) placeholder.remove();
-
-            // Convertir en tableau et trier par date de début décroissante
-            const expEntries = Object.entries(data.experiences).map(([key, exp]) => ({
-                key,
-                ...exp,
-                _endDate: parseExperienceDate(exp.fin, true),
-                _startDate: parseExperienceDate(exp.debut, false)
-            }));
-
-            expEntries.sort((a, b) => {
-                const startDiff = b._startDate - a._startDate;
-                if (startDiff !== 0) return startDiff;
-                return b._endDate - a._endDate;
-            });
-
-            // Créer le conteneur
-            const container = document.createElement('div');
-            container.className = 'timeline-container';
-
-            const bar = document.createElement('div');
-            bar.className = 'timeline-bar';
-            container.appendChild(bar);
-
-            const viewport = document.createElement('div');
-            viewport.className = 'timeline-viewport';
-
-            // Générer le HTML de chaque carte
-            function buildCardHTML(exp) {
-                let entrepriseHTML = exp.lien
-                    ? `<a href="${exp.lien}" target="_blank">${exp.entreprise}</a>`
-                    : exp.entreprise;
-
-                let infoSupHTML = '';
-                if (exp.infoSup) {
-                    infoSupHTML = `<p class="timeline-info-sup">${exp.infoSup}</p>`;
-                }
-
-                let projetsHTML = '';
-                if (exp.projets && exp.projets.length > 0) {
-                    projetsHTML = `
+        let projetsHTML = "";
+        if (exp.projets && exp.projets.length > 0) {
+          projetsHTML = `
                         <ul class="timeline-projets">
-                            ${exp.projets.map(p => `<li>${p}</li>`).join('')}
+                            ${exp.projets.map((p) => `<li>${p}</li>`).join("")}
                         </ul>
                     `;
-                }
+        }
 
-                return `
+        return `
                     <div class="timeline-card-header">
                         <h3>${exp.poste}</h3>
                         <span class="timeline-statut">${exp.statut}</span>
@@ -333,100 +384,106 @@ async function loadContent() {
                     ${infoSupHTML}
                     ${projetsHTML}
                 `;
-            }
+      }
 
-            // Créer toutes les entrées
-            expEntries.forEach((exp, i) => {
-                const entry = document.createElement('div');
-                entry.className = 'timeline-entry';
+      // Créer toutes les entrées
+      expEntries.forEach((exp, i) => {
+        const entry = document.createElement("div");
+        entry.className = "timeline-entry";
 
-                const dot = document.createElement('div');
-                dot.className = 'timeline-dot';
-                entry.appendChild(dot);
+        const dot = document.createElement("div");
+        dot.className = "timeline-dot";
+        entry.appendChild(dot);
 
-                const card = document.createElement('div');
-                card.className = 'timeline-card';
-                card.innerHTML = buildCardHTML(exp);
+        const card = document.createElement("div");
+        card.className = "timeline-card";
+        card.innerHTML = buildCardHTML(exp);
 
-                // Clic sur une carte pour la sélectionner
-                entry.addEventListener('click', () => {
-                    currentIndex = i;
-                    updateCarousel();
-                });
+        // Clic sur une carte pour la sélectionner
+        entry.addEventListener("click", () => {
+          currentIndex = i;
+          updateCarousel();
+        });
 
-                entry.appendChild(card);
-                viewport.appendChild(entry);
-            });
+        entry.appendChild(card);
+        viewport.appendChild(entry);
+      });
 
-            container.appendChild(viewport);
-            experiencesSection.appendChild(container);
+      container.appendChild(viewport);
+      experiencesSection.appendChild(container);
 
-            // Index actuel (centre du carousel)
-            let currentIndex = 0;
+      // Index actuel (centre du carousel)
+      let currentIndex = 0;
 
-            function updateCarousel() {
-                const allEntries = viewport.querySelectorAll('.timeline-entry');
-                const total = allEntries.length;
+      function updateCarousel() {
+        const allEntries = viewport.querySelectorAll(".timeline-entry");
+        const total = allEntries.length;
 
-                // Calculer la fenêtre de 3 éléments visibles
-                let start = currentIndex - 1;
-                let end = currentIndex + 1;
+        // Calculer la fenêtre de 3 éléments visibles
+        let start = currentIndex - 1;
+        let end = currentIndex + 1;
 
-                // Ajuster aux bords pour toujours afficher 3
-                if (start < 0) {
-                    start = 0;
-                    end = Math.min(2, total - 1);
-                }
-                if (end >= total) {
-                    end = total - 1;
-                    start = Math.max(0, total - 3);
-                }
-
-                allEntries.forEach((entry, i) => {
-                    entry.classList.remove('timeline-active', 'timeline-adjacent', 'timeline-hidden');
-
-                    if (i === currentIndex) {
-                        entry.classList.add('timeline-active');
-                    } else if (i >= start && i <= end) {
-                        entry.classList.add('timeline-adjacent');
-                    } else {
-                        entry.classList.add('timeline-hidden');
-                    }
-                });
-            }
-
-            // Navigation à la roulette
-            container.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                if (e.deltaY > 0 && currentIndex < expEntries.length - 1) {
-                    // Scroll bas → plus ancien
-                    currentIndex++;
-                    updateCarousel();
-                } else if (e.deltaY < 0 && currentIndex > 0) {
-                    // Scroll haut → plus récent
-                    currentIndex--;
-                    updateCarousel();
-                }
-            });
-
-            // Exposer la navigation pour le gamepad
-            window.navigateExperiences = (direction) => {
-                if (direction === 'up' && currentIndex > 0) {
-                    currentIndex--;
-                    updateCarousel();
-                } else if (direction === 'down' && currentIndex < expEntries.length - 1) {
-                    currentIndex++;
-                    updateCarousel();
-                }
-            };
-
-            // Initialiser l'affichage
-            updateCarousel();
+        // Ajuster aux bords pour toujours afficher 3
+        if (start < 0) {
+          start = 0;
+          end = Math.min(2, total - 1);
+        }
+        if (end >= total) {
+          end = total - 1;
+          start = Math.max(0, total - 3);
         }
 
-    } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
+        allEntries.forEach((entry, i) => {
+          entry.classList.remove(
+            "timeline-active",
+            "timeline-adjacent",
+            "timeline-hidden",
+          );
+
+          if (i === currentIndex) {
+            entry.classList.add("timeline-active");
+          } else if (i >= start && i <= end) {
+            entry.classList.add("timeline-adjacent");
+          } else {
+            entry.classList.add("timeline-hidden");
+          }
+        });
+      }
+
+      // Navigation à la roulette
+      container.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        if (e.deltaY > 0 && currentIndex < expEntries.length - 1) {
+          // Scroll bas → plus ancien
+          currentIndex++;
+          updateCarousel();
+        } else if (e.deltaY < 0 && currentIndex > 0) {
+          // Scroll haut → plus récent
+          currentIndex--;
+          updateCarousel();
+        }
+      });
+
+      // Exposer la navigation pour le gamepad
+      window.navigateExperiences = (direction) => {
+        if (direction === "up" && currentIndex > 0) {
+          currentIndex--;
+          updateCarousel();
+        } else if (
+          direction === "down" &&
+          currentIndex < expEntries.length - 1
+        ) {
+          currentIndex++;
+          updateCarousel();
+        }
+      };
+
+      // Initialiser l'affichage
+      updateCarousel();
     }
+  } catch (error) {
+    console.error("Erreur lors du chargement des données:", error);
+  }
 }
 
 // --- Système Gamepad ---
@@ -437,167 +494,186 @@ let previousButtonStates = {};
 let pollingActive = false;
 
 function showGamepadButtons() {
-    const gamepadButtons = document.querySelectorAll('.gamepad_btn');
-    gamepadButtons.forEach(btn => {
-        btn.style.display = 'flex';
-    });
+  const gamepadButtons = document.querySelectorAll(".gamepad_btn");
+  gamepadButtons.forEach((btn) => {
+    btn.style.display = "flex";
+  });
 }
 
 function hideGamepadButtons() {
-    const gamepadButtons = document.querySelectorAll('.gamepad_btn');
-    gamepadButtons.forEach(btn => {
-        btn.style.display = 'none';
-    });
+  const gamepadButtons = document.querySelectorAll(".gamepad_btn");
+  gamepadButtons.forEach((btn) => {
+    btn.style.display = "none";
+  });
 }
 
 // Fonction pour naviguer dans le carousel
 function navigateCarousel(direction) {
-    const navRadios = ['nav-accueil', 'nav-experiences', 'nav-projets'];
+  const navRadios = ["nav-accueil", "nav-experiences", "nav-projets"];
 
-    let currentIndex = navRadios.findIndex(id => document.getElementById(id).checked);
-    if (currentIndex === -1) currentIndex = 0;
+  let currentIndex = navRadios.findIndex(
+    (id) => document.getElementById(id).checked,
+  );
+  if (currentIndex === -1) currentIndex = 0;
 
-    let newIndex;
-    if (direction === 'left') {
-        newIndex = currentIndex > 0 ? currentIndex - 1 : navRadios.length - 1;
-    } else {
-        newIndex = currentIndex < navRadios.length - 1 ? currentIndex + 1 : 0;
-    }
+  let newIndex;
+  if (direction === "left") {
+    newIndex = currentIndex > 0 ? currentIndex - 1 : navRadios.length - 1;
+  } else {
+    newIndex = currentIndex < navRadios.length - 1 ? currentIndex + 1 : 0;
+  }
 
-    const radioElement = document.getElementById(navRadios[newIndex]);
-    radioElement.checked = true;
+  const radioElement = document.getElementById(navRadios[newIndex]);
+  radioElement.checked = true;
 
-    const label = document.querySelector(`label[for="${navRadios[newIndex]}"]`);
-    if (label) {
-        label.focus();
-    }
+  const label = document.querySelector(`label[for="${navRadios[newIndex]}"]`);
+  if (label) {
+    label.focus();
+  }
 }
 
 // Fonction pour naviguer dans les projets
 function navigateProjects(direction) {
-    const projectRadios = document.querySelectorAll('input[name="projectNav"]');
-    if (projectRadios.length === 0) return;
+  const projectRadios = document.querySelectorAll('input[name="projectNav"]');
+  if (projectRadios.length === 0) return;
 
-    let currentIndex = -1;
-    projectRadios.forEach((radio, index) => {
-        if (radio.checked) {
-            currentIndex = index;
-        }
-    });
-
-    if (currentIndex === -1) {
-        projectRadios[0].checked = true;
-        projectRadios[0].dispatchEvent(new Event('change'));
-        return;
+  let currentIndex = -1;
+  projectRadios.forEach((radio, index) => {
+    if (radio.checked) {
+      currentIndex = index;
     }
+  });
 
-    let newIndex;
-    if (direction === 'up') {
-        newIndex = currentIndex > 0 ? currentIndex - 1 : projectRadios.length - 1;
-    } else {
-        newIndex = currentIndex < projectRadios.length - 1 ? currentIndex + 1 : 0;
-    }
+  if (currentIndex === -1) {
+    projectRadios[0].checked = true;
+    projectRadios[0].dispatchEvent(new Event("change"));
+    return;
+  }
 
-    projectRadios[newIndex].checked = true;
-    projectRadios[newIndex].dispatchEvent(new Event('change'));
+  let newIndex;
+  if (direction === "up") {
+    newIndex = currentIndex > 0 ? currentIndex - 1 : projectRadios.length - 1;
+  } else {
+    newIndex = currentIndex < projectRadios.length - 1 ? currentIndex + 1 : 0;
+  }
 
-    const label = document.querySelector(`label[for="${projectRadios[newIndex].id}"]`);
-    if (label) {
-        label.focus();
-    }
+  projectRadios[newIndex].checked = true;
+  projectRadios[newIndex].dispatchEvent(new Event("change"));
+
+  const label = document.querySelector(
+    `label[for="${projectRadios[newIndex].id}"]`,
+  );
+  if (label) {
+    label.focus();
+  }
 }
 
 // Fonction de polling pour détecter les pressions de boutons
 function pollGamepad() {
-    const gamepads = navigator.getGamepads();
+  const gamepads = navigator.getGamepads();
 
-    for (let i = 0; i < gamepads.length; i++) {
-        const gamepad = gamepads[i];
-        if (gamepad && connectedGamepads[gamepad.index]) {
-            if (!previousButtonStates[gamepad.index]) {
-                previousButtonStates[gamepad.index] = [];
-            }
+  for (let i = 0; i < gamepads.length; i++) {
+    const gamepad = gamepads[i];
+    if (gamepad && connectedGamepads[gamepad.index]) {
+      if (!previousButtonStates[gamepad.index]) {
+        previousButtonStates[gamepad.index] = [];
+      }
 
-            gamepad.buttons.forEach((button, buttonIndex) => {
-                const wasPressed = previousButtonStates[gamepad.index][buttonIndex] || false;
-                const isPressed = button.pressed;
+      gamepad.buttons.forEach((button, buttonIndex) => {
+        const wasPressed =
+          previousButtonStates[gamepad.index][buttonIndex] || false;
+        const isPressed = button.pressed;
 
-                if (isPressed && !wasPressed) {
-                    console.log(`Bouton ${buttonIndex} pressé`);
+        if (isPressed && !wasPressed) {
+          console.log(`Bouton ${buttonIndex} pressé`);
 
-                    if (buttonIndex === 4 || buttonIndex === 6) {
-                        navigateCarousel('left');
-                    } else if (buttonIndex === 5 || buttonIndex === 7) {
-                        navigateCarousel('right');
-                    } else if (buttonIndex === 12 && document.getElementById("nav-projets").checked) {
-                        navigateProjects('up');
-                    } else if (buttonIndex === 13 && document.getElementById("nav-projets").checked) {
-                        navigateProjects('down');
-                    } else if (buttonIndex === 12 && document.getElementById("nav-experiences").checked && window.navigateExperiences) {
-                        window.navigateExperiences('up');
-                    } else if (buttonIndex === 13 && document.getElementById("nav-experiences").checked && window.navigateExperiences) {
-                        window.navigateExperiences('down');
-                    }
-                }
-
-                previousButtonStates[gamepad.index][buttonIndex] = isPressed;
-            });
+          if (buttonIndex === 4 || buttonIndex === 6) {
+            navigateCarousel("left");
+          } else if (buttonIndex === 5 || buttonIndex === 7) {
+            navigateCarousel("right");
+          } else if (
+            buttonIndex === 12 &&
+            document.getElementById("nav-projets").checked
+          ) {
+            navigateProjects("up");
+          } else if (
+            buttonIndex === 13 &&
+            document.getElementById("nav-projets").checked
+          ) {
+            navigateProjects("down");
+          } else if (
+            buttonIndex === 12 &&
+            document.getElementById("nav-experiences").checked &&
+            window.navigateExperiences
+          ) {
+            window.navigateExperiences("up");
+          } else if (
+            buttonIndex === 13 &&
+            document.getElementById("nav-experiences").checked &&
+            window.navigateExperiences
+          ) {
+            window.navigateExperiences("down");
+          }
         }
-    }
 
-    if (Object.keys(connectedGamepads).length > 0) {
-        requestAnimationFrame(pollGamepad);
-    } else {
-        pollingActive = false;
+        previousButtonStates[gamepad.index][buttonIndex] = isPressed;
+      });
     }
+  }
+
+  if (Object.keys(connectedGamepads).length > 0) {
+    requestAnimationFrame(pollGamepad);
+  } else {
+    pollingActive = false;
+  }
 }
 
 function connectGamepad(event) {
-    const gamepad = event.gamepad;
-    connectedGamepads[gamepad.index] = gamepad;
-    showGamepadButtons();
+  const gamepad = event.gamepad;
+  connectedGamepads[gamepad.index] = gamepad;
+  showGamepadButtons();
 
-    if (!pollingActive) {
-        pollingActive = true;
-        requestAnimationFrame(pollGamepad);
-    }
+  if (!pollingActive) {
+    pollingActive = true;
+    requestAnimationFrame(pollGamepad);
+  }
 }
 
 function disconnectGamepad(event) {
-    const gamepad = event.gamepad;
-    delete connectedGamepads[gamepad.index];
-    delete previousButtonStates[gamepad.index];
+  const gamepad = event.gamepad;
+  delete connectedGamepads[gamepad.index];
+  delete previousButtonStates[gamepad.index];
 
-    if (Object.keys(connectedGamepads).length === 0) {
-        hideGamepadButtons();
-    }
+  if (Object.keys(connectedGamepads).length === 0) {
+    hideGamepadButtons();
+  }
 }
 
 function checkGamepadOnLoad() {
-    if (!navigator.getGamepads) {
-        return;
-    }
+  if (!navigator.getGamepads) {
+    return;
+  }
 
-    const gamepads = navigator.getGamepads();
-    for (let i = 0; i < gamepads.length; i++) {
-        if (gamepads[i] !== null) {
-            connectedGamepads[i] = gamepads[i];
-        }
+  const gamepads = navigator.getGamepads();
+  for (let i = 0; i < gamepads.length; i++) {
+    if (gamepads[i] !== null) {
+      connectedGamepads[i] = gamepads[i];
     }
+  }
 
-    if (Object.keys(connectedGamepads).length > 0) {
-        showGamepadButtons();
-        if (!pollingActive) {
-            pollingActive = true;
-            requestAnimationFrame(pollGamepad);
-        }
+  if (Object.keys(connectedGamepads).length > 0) {
+    showGamepadButtons();
+    if (!pollingActive) {
+      pollingActive = true;
+      requestAnimationFrame(pollGamepad);
     }
+  }
 }
 
 // Attendre que le DOM soit chargé
-document.addEventListener('DOMContentLoaded', () => {
-    loadContent();
-    checkGamepadOnLoad();
+document.addEventListener("DOMContentLoaded", () => {
+  loadContent();
+  checkGamepadOnLoad();
 });
 
 window.addEventListener("gamepadconnected", connectGamepad);
